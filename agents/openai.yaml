@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hatch Pet Any Action"
+  short_description: "Hatch Codex pets with inferred or custom action sets"
+  default_prompt: "Hatch a Codex-compatible animated pet from a concept, reference images, or both. Infer missing names/descriptions and infer a suitable action set when the user only provides natural-language behaviors. Use $imagegen for the base and grounded row strips, then use this skill's deterministic scripts to validate frames, assemble the spritesheet, and package the pet with pet.json action metadata under ${CODEX_HOME:-$HOME/.codex}/pets/<pet-name>/."
