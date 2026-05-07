@@ -57,6 +57,28 @@ test("buildPetPromptText uses the revised custom-action wording in Chinese", () 
   assert.doesNotMatch(prompt, /支持少于或多于 9 个动作/);
 });
 
+test("buildPetPromptText includes custom action notes when provided", () => {
+  const prompt = buildPetPromptText("custom", "zh", {
+    name: "雪团",
+    concept: "一只戴围巾的雪狐",
+    actions: "idle、jump、wave，jump 8 帧左右",
+    style: "粗描边像素风",
+  });
+
+  assert.match(prompt, /动作要求：idle、jump、wave，jump 8 帧左右/);
+});
+
+test("buildPetPromptText ignores custom action notes in legacy mode", () => {
+  const prompt = buildPetPromptText("legacy", "zh", {
+    name: "雪团",
+    concept: "一只戴围巾的雪狐",
+    actions: "idle、jump、wave",
+    style: "粗描边像素风",
+  });
+
+  assert.doesNotMatch(prompt, /动作要求：/);
+});
+
 test("buildCodexPromptText points at the GuardSkill GitHub repo in English", () => {
   const prompt = buildCodexPromptText("en", {
     name: "Frosty",

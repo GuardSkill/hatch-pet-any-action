@@ -57,6 +57,8 @@ const TRANSLATIONS = {
     namePlaceholder: "雪团",
     conceptLabel: "概念",
     conceptPlaceholder: "一只戴蓝围巾的小像素雪狐",
+    actionsInputLabel: "动作要求",
+    actionsInputPlaceholder: "例如：idle、jump、wave、sleep；也可以写每个动作的大致姿态和帧数倾向",
     styleLabel: "风格说明",
     stylePlaceholder: "Codex 数字宠物风格，粗描边，平涂赛璐璐阴影",
     buildPrompt: "生成 Codex 提示词",
@@ -105,19 +107,26 @@ const TRANSLATIONS = {
       concept: "一只自定义像素风 Codex 宠物",
       style: "Codex 数字宠物风格，紧凑的 Q 版比例，深色粗描边，平涂赛璐璐阴影",
     },
-    buildCustomPromptText: ({ name, concept, style }) =>
-      [
+    buildCustomPromptText: ({ name, concept, actions, style }) => {
+      const lines = [
         `使用 hatch-pet-any-action，帮我孵化一只名叫 ${name} 的宠物。`,
         "",
         `skill GitHub 地址：${SKILL_GITHUB_URL}`,
         "",
         `概念：${concept}`,
+      ];
+      if (actions) {
+        lines.push(`动作要求：${actions}`);
+      }
+      lines.push(
         `风格：${style}`,
         "",
         "请根据自然语言描述推断动作集合，",
         "请生成完整 宠物资源包，包括 pet.json、spritesheet.webp、contact sheet 和验证结果。",
         "运行时启用子代理。",
-      ].join("\n"),
+      );
+      return lines.join("\n");
+    },
     buildLegacyPromptText: ({ name, concept, style }) =>
       [
         `使用 hatch-pet，帮我孵化一只名叫 ${name} 的宠物。`,
@@ -182,6 +191,8 @@ const TRANSLATIONS = {
     namePlaceholder: "Frosty",
     conceptLabel: "Concept",
     conceptPlaceholder: "A tiny pixel-art snow fox with a blue scarf",
+    actionsInputLabel: "Action notes",
+    actionsInputPlaceholder: "For example: idle, jump, wave, sleep; you can also describe poses or frame-count preferences",
     styleLabel: "Style notes",
     stylePlaceholder: "Codex digital pet style, thick outline, flat cel shading",
     buildPrompt: "Build Codex prompt",
@@ -230,19 +241,26 @@ const TRANSLATIONS = {
       concept: "a custom pixel-art Codex pet",
       style: "Codex digital pet style, compact chibi proportions, thick dark outline, flat cel shading",
     },
-    buildCustomPromptText: ({ name, concept, style }) =>
-      [
+    buildCustomPromptText: ({ name, concept, actions, style }) => {
+      const lines = [
         `Use hatch-pet-any-action to hatch a pet named ${name}.`,
         "",
         `Skill GitHub URL: ${SKILL_GITHUB_URL}`,
         "",
         `Concept: ${concept}`,
+      ];
+      if (actions) {
+        lines.push(`Action notes: ${actions}`);
+      }
+      lines.push(
         `Style: ${style}`,
         "",
         "Infer the action set from the natural-language description, supporting fewer or more than 9 actions.",
         "Generate the full Codex pet package, including pet.json, spritesheet.webp, the contact sheet, and validation outputs.",
         "Use subagents during the run.",
-      ].join("\n"),
+      );
+      return lines.join("\n");
+    },
     buildLegacyPromptText: ({ name, concept, style }) =>
       [
         `Use hatch-pet to hatch a pet named ${name}.`,
@@ -293,6 +311,7 @@ function buildPetPromptText(mode, language, details = {}) {
   return builder({
     name: String(details.name || "").trim() || defaults.name,
     concept: String(details.concept || "").trim() || defaults.concept,
+    actions: String(details.actions || "").trim(),
     style: String(details.style || "").trim() || defaults.style,
   });
 }

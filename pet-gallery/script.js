@@ -62,6 +62,9 @@ const els = {
   createName: document.querySelector("#createName"),
   conceptLabel: document.querySelector("#conceptLabel"),
   createConcept: document.querySelector("#createConcept"),
+  actionsField: document.querySelector("#actionsField"),
+  actionsInputLabel: document.querySelector("#actionsInputLabel"),
+  createActions: document.querySelector("#createActions"),
   styleLabel: document.querySelector("#styleLabel"),
   createStyle: document.querySelector("#createStyle"),
   exportState: document.querySelector("#exportState"),
@@ -137,6 +140,7 @@ function syncCreateModeStyles() {
   const isLegacy = getSelectedCreateMode() === "legacy";
   els.modeCustomOption.setAttribute("data-selected", String(!isLegacy));
   els.modeLegacyOption.setAttribute("data-selected", String(isLegacy));
+  els.actionsField.hidden = isLegacy;
 }
 
 function applyLanguage(language, { persist = false } = {}) {
@@ -185,6 +189,8 @@ function applyLanguage(language, { persist = false } = {}) {
   els.createName.placeholder = copy.namePlaceholder;
   els.conceptLabel.textContent = copy.conceptLabel;
   els.createConcept.placeholder = copy.conceptPlaceholder;
+  els.actionsInputLabel.textContent = copy.actionsInputLabel;
+  els.createActions.placeholder = copy.actionsInputPlaceholder;
   els.styleLabel.textContent = copy.styleLabel;
   els.createStyle.placeholder = copy.stylePlaceholder;
   els.buildPrompt.textContent = copy.buildPrompt;
@@ -647,13 +653,55 @@ function buildCodexPrompt() {
   els.codexPrompt.value = buildPetPromptText(currentCreateMode, currentLanguage, {
     name: els.createName.value,
     concept: els.createConcept.value,
+    actions: currentCreateMode === "custom" ? els.createActions.value : "",
     style: els.createStyle.value,
   });
 }
 
+function fallbackCopyFromTextarea(textarea) {
+  const previousSelectionStart = textarea.selectionStart;
+  const previousSelectionEnd = textarea.selectionEnd;
+  const previousReadOnly = textarea.readOnly;
+
+  textarea.readOnly = false;
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } finally {
+    textarea.readOnly = previousReadOnly;
+    if (
+      typeof previousSelectionStart === "number" &&
+      typeof previousSelectionEnd === "number"
+    ) {
+      textarea.setSelectionRange(previousSelectionStart, previousSelectionEnd);
+    }
+    textarea.blur();
+  }
+
+  if (!copied) {
+    throw new Error("Clipboard API unavailable");
+  }
+}
+
 async function copyPrompt() {
   if (!els.codexPrompt.value.trim()) buildCodexPrompt();
-  await navigator.clipboard.writeText(els.codexPrompt.value);
+  const clipboardApi =
+    window.navigator &&
+    window.navigator.clipboard &&
+    typeof window.navigator.clipboard.writeText === "function"
+      ? window.navigator.clipboard
+      : null;
+
+  if (clipboardApi) {
+    await clipboardApi.writeText(els.codexPrompt.value);
+  } else {
+    fallbackCopyFromTextarea(els.codexPrompt);
+  }
+
   els.copyPrompt.textContent = strings().copiedPrompt;
   window.setTimeout(() => {
     els.copyPrompt.textContent = strings().copyPrompt;
