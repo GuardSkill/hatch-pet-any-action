@@ -1,0 +1,12 @@
+{
+  "dog": {
+    "displayName": "dog",
+    "description": "A cute anime dog in Codex digital pet style.",
+    "spritesheetFile": "spritesheet.webp"
+  },
+  "bordermic": {
+    "displayName": "BorderMic",
+    "description": "A chibi pixel-style border collie puppy pet with jump, dragged-air, walking, and singing microphone actions.",
+    "spritesheetFile": "spritesheet.webp"
+  }
+}

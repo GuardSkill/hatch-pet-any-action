@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Codex 宠物工作台</title>
+    <script>
+      (function () {
+        var storageKey = "pet-gallery-language";
+        var stored = "";
+        try {
+          stored = window.localStorage.getItem(storageKey) || "";
+        } catch (error) {}
+        var normalizedStored = String(stored || "").trim().toLowerCase();
+        var normalizedBrowser = String(navigator.language || "").trim().toLowerCase();
+        var language = normalizedStored.indexOf("en") === 0 ? "en" : normalizedStored.indexOf("zh") === 0 ? "zh" : normalizedBrowser.indexOf("en") === 0 ? "en" : "zh";
+        document.documentElement.lang = language === "en" ? "en" : "zh-CN";
+        document.documentElement.dataset.preferredLang = language;
+        document.documentElement.dataset.i18nReady = "false";
+        document.title = language === "en" ? "Codex Pet Studio" : "Codex 宠物工作台";
+      })();
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p id="appEyebrow" class="eyebrow">Codex 宠物工作台</p>
+          <h1 id="heroTitle">共享宠物库</h1>
+          <p id="heroCopy" class="hero-copy">同一台机器上的所有浏览器共享同一个本地宠物库，支持上传、下载和密码删除。</p>
+        </div>
+        <div class="topbar-actions">
+          <div class="language-switch" role="group" aria-label="Language switch">
+            <button id="langZh" type="button" aria-pressed="true">中文</button>
+            <button id="langEn" type="button" aria-pressed="false">EN</button>
+          </div>
+          <button id="refreshPets" type="button" title="重新加载共享宠物库">刷新</button>
+          <button id="exportState" type="button" title="导出当前宠物列表元数据">导出列表</button>
+        </div>
+      </header>
+
+      <p id="statusBanner" class="status-banner" hidden aria-live="polite"></p>
+
+      <section class="workspace">
+        <aside id="libraryPanel" class="side-panel" aria-label="宠物库">
+          <div class="section-heading">
+            <div>
+              <h2 id="libraryTitle">宠物库</h2>
+              <p id="libraryCopy" class="section-copy">由本地服务持久化，当前机器上的所有浏览器共享同一套宠物。</p>
+            </div>
+            <p id="petCount">0 已加载</p>
+          </div>
+          <div id="petList" class="pet-list"></div>
+
+          <div class="upload-panel">
+            <div class="section-heading compact">
+              <div>
+                <h2 id="uploadTitle">上传资源包</h2>
+                <p id="uploadCopy" class="section-copy">把宠物写入磁盘上的共享宠物库。</p>
+              </div>
+            </div>
+            <label class="file-drop">
+              <span id="petJsonLabel">pet.json</span>
+              <input id="petJsonInput" type="file" accept=".json,application/json" />
+            </label>
+            <label class="file-drop">
+              <span id="spritesheetLabel">spritesheet.webp / png</span>
+              <input id="spritesheetInput" type="file" accept=".webp,.png,image/webp,image/png" />
+            </label>
+            <button id="loadPair" class="primary-button" type="button">上传选中的文件</button>
+
+            <label class="folder-drop">
+              <span id="folderDropLabel">读取宠物文件夹</span>
+              <input id="folderInput" type="file" webkitdirectory multiple />
+            </label>
+          </div>
+        </aside>
+
+        <section id="viewerSection" class="viewer" aria-label="动画预览">
+          <div class="viewer-info">
+            <p class="eyebrow" id="petId">-</p>
+            <h2 id="petName">加载中...</h2>
+            <p id="petDescription" class="description">正在连接共享宠物库。</p>
+          </div>
+
+          <div class="stage">
+            <div id="sprite" class="sprite" role="img" aria-label="当前宠物动画"></div>
+          </div>
+
+          <div id="controlsSection" class="controls" aria-label="动画控制">
+            <button id="playPause" type="button">暂停</button>
+            <label>
+              <span id="speedLabel">速度</span>
+              <input id="speed" type="range" min="70" max="420" value="150" />
+            </label>
+            <label>
+              <span id="scaleLabel">缩放</span>
+              <input id="scale" type="range" min="1" max="4" value="1.5" step="0.25" />
+            </label>
+          </div>
+
+          <section id="actionsSection" class="actions" aria-label="宠物动作">
+            <div class="section-heading">
+              <h2 id="actionsTitle">动作</h2>
+              <p id="currentMeta">idle - 6 帧</p>
+            </div>
+            <div id="actionButtons" class="action-buttons"></div>
+          </section>
+        </section>
+
+        <aside id="createPanel" class="side-panel create-panel" aria-label="生成宠物提示词">
+          <div class="section-heading compact">
+            <div>
+              <h2 id="createTitle">生成提示词</h2>
+              <p id="createCopy" class="section-copy">为下一只 Codex 宠物资源包生成提示词。</p>
+            </div>
+          </div>
+          <fieldset class="mode-picker">
+            <legend id="createModeTitle">创建模式</legend>
+            <label id="modeCustomOption" class="mode-option" data-selected="true">
+              <input id="modeCustom" type="radio" name="createMode" value="custom" checked />
+              <span>
+                <strong id="modeCustomLabel">自定义动作</strong>
+                <small id="modeCustomCopy">由 Codex 根据自然语言推断动作集合。</small>
+              </span>
+            </label>
+            <label id="modeLegacyOption" class="mode-option" data-selected="false">
+              <input id="modeLegacy" type="radio" name="createMode" value="legacy" />
+              <span>
+                <strong id="modeLegacyLabel">Codex 默认 9 动作</strong>
+                <small id="modeLegacyCopy">兼容旧版固定 9 动作宠物流程。</small>
+              </span>
+            </label>
+          </fieldset>
+          <p id="createModeHint" class="section-copy">把下面提示词粘贴到 Codex 使用，Codex 会根据自然语言推断动作集合。</p>
+          <label>
+            <span id="nameLabel">名称</span>
+            <input id="createName" type="text" placeholder="雪团" />
+          </label>
+          <label>
+            <span id="conceptLabel">概念</span>
+            <textarea id="createConcept" rows="5" placeholder="一只戴蓝围巾的小像素雪狐"></textarea>
+          </label>
+          <label>
+            <span id="styleLabel">风格说明</span>
+            <textarea id="createStyle" rows="4" placeholder="Codex 数字宠物风格，粗描边，平涂赛璐璐阴影"></textarea>
+          </label>
+          <button id="buildPrompt" type="button">生成 Codex 提示词</button>
+          <textarea id="codexPrompt" rows="8" readonly></textarea>
+          <button id="copyPrompt" type="button">复制提示词</button>
+        </aside>
+      </section>
+
+      <section class="atlas">
+        <div class="section-heading">
+          <div>
+            <h2 id="atlasTitle">全部动画</h2>
+            <p id="atlasCopy" class="section-copy">以下动画从当前选中的 spritesheet 行中裁切展示。</p>
+          </div>
+        </div>
+        <div id="animationGrid" class="animation-grid"></div>
+      </section>
+    </main>
+
+    <div id="deleteModal" class="modal-shell" hidden>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+        <div class="section-heading compact">
+          <div>
+            <h2 id="deleteModalTitle">删除宠物</h2>
+            <p id="deleteModalText" class="section-copy">输入删除密码以移除这个已上传宠物。</p>
+          </div>
+        </div>
+        <label>
+          <span id="deletePasswordLabel">密码</span>
+          <input id="deletePassword" type="password" inputmode="numeric" placeholder="104228" />
+        </label>
+        <p id="deleteError" class="modal-error" hidden></p>
+        <div class="modal-actions">
+          <button id="cancelDelete" type="button">取消</button>
+          <button id="confirmDelete" type="button">删除宠物</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="./pet-manifest.js"></script>
+    <script src="./site-i18n.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>

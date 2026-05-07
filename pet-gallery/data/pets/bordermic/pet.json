@@ -1,0 +1,108 @@
+{
+  "id": "bordermic",
+  "displayName": "BorderMic",
+  "description": "A chibi pixel-style border collie puppy pet with jump, dragged-air, walking, and singing microphone actions.",
+  "spritesheetPath": "spritesheet.webp",
+  "cellWidth": 192,
+  "cellHeight": 208,
+  "atlas": {
+    "columns": 8,
+    "rows": 6
+  },
+  "actions": [
+    {
+      "id": "idle",
+      "label": "Idle",
+      "frames": 6,
+      "purpose": "neutral breathing/blinking loop",
+      "durations": [
+        280,
+        110,
+        110,
+        140,
+        140,
+        320
+      ],
+      "row": 0
+    },
+    {
+      "id": "jumping",
+      "label": "Jumping",
+      "frames": 6,
+      "purpose": "anticipation, lift, peak, descent, settle",
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        280,
+        280
+      ],
+      "row": 1
+    },
+    {
+      "id": "dragged-air",
+      "label": "Dragged Air",
+      "frames": 4,
+      "purpose": "dragged air loop",
+      "durations": [
+        140,
+        140,
+        140,
+        220
+      ],
+      "row": 2
+    },
+    {
+      "id": "running-left",
+      "label": "Walk Left",
+      "frames": 8,
+      "purpose": "leftward locomotion loop",
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ],
+      "row": 3
+    },
+    {
+      "id": "running-right",
+      "label": "Walk Right",
+      "frames": 8,
+      "purpose": "rightward locomotion loop",
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ],
+      "row": 4
+    },
+    {
+      "id": "singing-mic",
+      "label": "Singing Mic",
+      "frames": 8,
+      "purpose": "singing mic loop",
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        140,
+        140,
+        220
+      ],
+      "row": 5
+    }
+  ]
+}
