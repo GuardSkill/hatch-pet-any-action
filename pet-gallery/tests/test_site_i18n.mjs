@@ -71,7 +71,7 @@ test("buildCodexPromptText points at the GuardSkill GitHub repo in English", () 
 
 test("translation helpers expose the configured language storage key and English UI copy", () => {
   assert.equal(LANGUAGE_STORAGE_KEY, "pet-gallery-language");
-  assert.equal(SKILL_GITHUB_URL, "https://github.com/GuardSkill/hatch-pet-any-action/hatch-pet-any-action");
+  assert.equal(SKILL_GITHUB_URL, "https://github.com/GuardSkill/hatch-pet-any-action/tree/main/hatch-pet-any-action");
   assert.equal(getTranslations("en").refreshLabel, "Refresh");
   assert.equal(getTranslations("zh").refreshLabel, "刷新");
 });

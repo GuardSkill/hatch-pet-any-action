@@ -2,7 +2,7 @@
 
 (function () {
 const LANGUAGE_STORAGE_KEY = "pet-gallery-language";
-const SKILL_GITHUB_URL = "https://github.com/GuardSkill/hatch-pet-any-action/hatch-pet-any-action";
+const SKILL_GITHUB_URL = "https://github.com/GuardSkill/hatch-pet-any-action/tree/main/hatch-pet-any-action";
 const LEGACY_SKILL_URL = "https://github.com/openai/skills/tree/main/skills/.curated/hatch-pet";
 
 const TRANSLATIONS = {
